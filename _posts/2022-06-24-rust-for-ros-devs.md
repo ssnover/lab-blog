@@ -2,7 +2,6 @@
 layout: post
 title: "Guide to Rust for ROS Developers"
 date: 2022-06-24 17:00:00 -0800
-categories: ros rust
 ---
 This is supposed to be an informal guide to act as a quickstart for developing in Rust as someone who is experienced in writing C++ for robotics. I’m hoping that this helps cut to the chase over some of the materials you might find online for getting started with Rust that can’t assume that you’re already familiar with the difference between stack and heap memory, what a compiler does, etc.
 
