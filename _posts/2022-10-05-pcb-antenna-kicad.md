@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Making a PCB Antenna in KiCAD 6.0"
-data: 2022-10-05 22:00:00 -0800
+date: 2022-10-05 22:00:00 -0800
 ---
 I've been going back to my hardware roots a little bit lately and trying out electrical and PCB design for a project I've been thinking about for a while. There will be two boards talking wirelessly over nRF24L01 transceivers at 2.4 GHz. One of my biggest stumbling blocks during the process has been adding an antenna similar to the one I see on all of the hobby board for this chip. Since I am making my own board and didn't want to just add pin breakouts to plug in a board I set out to add a PCB antenna.
 

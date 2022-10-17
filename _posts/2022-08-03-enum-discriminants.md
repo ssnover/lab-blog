@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Exploring Enum Discriminants for Data-Carrying Enums"
-data: 2022-08-03 17:45:00 -0800
+date: 2022-08-03 17:45:00 -0800
 ---
 I've been back-burnering thinking about how to simply represent a binary protocol in Rust with a relatively concise deserialization mechanism for quite some time. I frequently write binary protocols whereby data is packed and the data is not self-describing (like CBOR and JSON). So if I have a command carrying data I might have a string of bytes like these:
 
