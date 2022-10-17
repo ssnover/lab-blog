@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Debugging Failures in ROS Integration Tests"
-data: 2022-08-09 19:15:00 -0800
+date: 2022-08-09 19:15:00 -0800
 ---
 
 Today I found myself debugging a CI pipeline failure involving a ROS1 integration. And it was not convenient.
