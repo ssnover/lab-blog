@@ -1,0 +1,36 @@
+---
+layout: default
+---
+<article class="post">
+
+  <header class="project-header">
+    <h1 class="post-title">{{ page.name | escape }}</h1>
+  </header>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  <div class="post-content">
+    <h2>Repository</h2>
+    <a href="{{ page.repo }}">Git Repository</a>
+  </div>
+
+  <div class="post-conent">
+    <h2>Related Posts</h2>
+    <ul class="post-list">
+      {%- for post in site.posts -%}
+        {%- for project_tag in post.projects -%}
+          {%- if page.tag == project_tag -%}
+          <li>
+            <a href="{{ post.url | relative_url }}">
+              &bull; {{ post.title | escape }}
+            </a>
+          </li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+
+</article>
