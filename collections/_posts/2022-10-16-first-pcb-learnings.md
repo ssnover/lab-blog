@@ -2,6 +2,7 @@
 layout: post
 title: "Lessons Learned while Sending my First PCB to Fabrication"
 date: 2022-10-16 18:00:00 -0800
+projects: [atmosensor]
 ---
 
 I've just ordered my first custom home-grown, glacier-watered, grass-fed printed circuit board (4.5 years after graduating with an EE degree, yikes!) and wanted to jot down some notes from the process while everything is still fresh. If you're getting tired of breadboards and hand soldering but have felt intimidated at the process of jumping into full circuit design without the help of a development board, hopefully you can glean something from this short post and it will inspire you to make the leap!
