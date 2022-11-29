@@ -16,15 +16,15 @@ layout: default
     <a href="{{ page.repo }}">Git Repository</a>
   </div>
 
-  <div class="post-conent">
+  <div class="post-content">
     <h2>Related Posts</h2>
-    <ul class="post-list">
+    <ul>
       {%- for post in site.posts -%}
         {%- for project_tag in post.projects -%}
           {%- if page.tag == project_tag -%}
           <li>
             <a href="{{ post.url | relative_url }}">
-              &bull; {{ post.title | escape }}
+              {{ post.title | escape }}
             </a>
           </li>
           {%- endif -%}
