@@ -99,7 +99,8 @@ use tokio_serial::SerialPortBuilderExt;
 The data point here has to implement the trait `WriteDataPoint` and it's important to add a tag
 for the data `plant` which I'm using as the name, then the timestamp (which may be possible to 
 omit in which case it will use the current time as default), and finally the actual datapoint 
-which is a field.
+which is a field. If you miss the `measurement = "your_name"` attribute here, it will use the
+name of the struct.
 
 ```rust
 #[derive(Default, WriteDataPoint)]
