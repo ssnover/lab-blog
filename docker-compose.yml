@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  site_server:
+    image: jekyll-build:latest
+    ports:
+      - "4000:4000"
+    volumes:
+      - "./:/blog"
+    command: bash -c "bundle exec jekyll serve --host 0.0.0.0 --livereload"
+    
