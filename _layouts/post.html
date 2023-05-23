@@ -10,9 +10,12 @@ layout: default
         {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
         {{ page.date | date: date_format }}
       </time>
+      | {{ content | reading_time }}-minute read
       {%- if page.author -%}
-        • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">{{ page.author }}</span></span>
-      {%- endif -%}</p>
+      • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card"
+          itemprop="name">{{ page.author }}</span></span>
+      {%- endif -%}
+    </p>
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
@@ -23,4 +26,5 @@ layout: default
 </article>
 
 <hr>
-<p>If you notice a dead link or have some other correction to make, feel free to <a href="https://github.com/ssnover/lab-blog/issues/new/choose">make an issue on GitHub!</a></p>
+<p>If you notice a dead link or have some other correction to make, feel free to <a
+    href="https://github.com/ssnover/lab-blog/issues/new/choose">make an issue on GitHub!</a></p>
