@@ -25,7 +25,6 @@ description: >-
   and usually Rust, but sometimes hardware and robotics development too.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://shanesnover.com" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: shane_snover
 github_username:  ssnover
 mastodon:
   - username: ssnover
