@@ -26,9 +26,6 @@ description: >-
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://shanesnover.com" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  ssnover
-mastodon:
-  - username: ssnover
-    instance: fosstodon.org
 collections_dir: collections
 collections:
   projects:
