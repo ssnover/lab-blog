@@ -1,0 +1,512 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Collecting Temperature Data - Introduction to Internet of Things with Arduino and Python</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../installs.html">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_3_pyserial.html"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_4_temp_data.html" class="active"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_5_uploading_data.html"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="../appendix/influxdb.html">A2. Running InfluxDB</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Introduction to Internet of Things with Arduino and Python</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="collecting-temperature-data"><a class="header" href="#collecting-temperature-data">Collecting Temperature Data</a></h1>
+<p>Now that we've verified sending serial data from the Arduino to our python script, let's read some real data! For this tutorial, we're using an AHT20 temperature sensor which we can read data from via the I2C protocol (pronounced &quot;I squared C&quot; or &quot;I two C&quot;).</p>
+<p>For legal reasons that I won't pretend to understand comprehensively, there are a number of &quot;I2C-compatible&quot; protocols and devices which implement the same protocol but are just called different things. For the Atmega328 (the microcontroller running on the Arduino UNO), it's called two-wire interface (TWI), but pretty much everywhere you'll see it referred to as I2C.</p>
+<p>There's a <a href="https://github.com/adafruit/Adafruit_AHTX0">library from Adafruit</a> for the sensor used here. However, this is fairly simple sensor so we'll roll our own as an exercise in reading a datasheet for a device like this. An online copy of the datasheet is <a href="https://files.seeedstudio.com/wiki/Grove-AHT20_I2C_Industrial_Grade_Temperature_and_Humidity_Sensor/AHT20-datasheet-2020-4-16.pdf">here</a>. You can usually find a link to the datasheet on the product page of the store where you bought the sensor.</p>
+<p>In the datasheet, the sections we're interested in are Section 5 which describes the commands used to communicate with the sensor and Section 6 which describes how to take the raw binary number reported by the sensor and turn it into a temperature in degrees Celsius. I'll be referring to these sections throughout the chapter.</p>
+<p>The first piece of information we need is the I2C address. I2C is a bus protocol where multiple devices can be attached to two signals: the clock line and data line. The address is used so that a device knows that the data being sent on the bus is intended for it. Section 5.3 mentions that the I2C address is <code>0x38</code>.</p>
+<p>With the address, this device also accepts certain commands which are each represented with a byte. The same section includes a table of the commands. The relevant ones for us are &quot;Initialization&quot; and &quot;Trigger measurement&quot;, we'll ignore the last one. Reading the next section, 5.4, actually reveals an additional command which will be important, getting the status register. A lot of these datasheets are pretty poorly written and this is a pretty good example. That's another reason to find a library if one exists, to use it as a reference when something in the datasheet doesn't make sense.</p>
+<p>The initialization process called for is to wait for 40 ms for the device to power up, then check the status byte. If bit 3 of the status byte is set (or it's a <code>1</code>), then it is calibrated. If not, we need to calibrate it with the Initialization command.</p>
+<p>Now let's implement what we've read out of the datasheet:</p>
+<pre><code class="language-cpp">#include &quot;Wire.h&quot;
+#include &lt;stdint.h&gt;
+
+const uint8_t AHT20_I2C_ADDR(0x38);
+const uint8_t GET_STATUS(0x71);
+const uint8_t CALIBRATE_CMD(0xbe);
+const unsigned int SENSOR_INIT_DELAY(40);
+const unsigned int SENSOR_CALIBRATION_DELAY(10);
+</code></pre>
+<p>First we'll pull in the Arduino's I2C library with in <code>Wire.h</code> and we'll pull in <code>stdint.h</code> which is a standard C library that defines a bunch of fixed-size types. This allows specifying that a variable is a <code>uint8_t</code> instead of an <code>unsigned int</code>. The former will always be a single byte (8 bits). The latter can change it's size based on the hardware that's being compiled to. Because every byte counts when you're working with hardware and if you send an extra byte the command you send to a sensor won't be understood at all! Define a bunch of constants for the I2C address and the two commands we need to initialize the sensor.</p>
+<p>Next we'll write a function to get the status since that's the first thing we need to do:</p>
+<pre><code class="language-cpp">uint8_t get_status(uint8_t address) {
+    Wire.requestFrom(address, 1);
+    while (!Wire.available()) {
+        delay(1);
+    }
+    uint8_t status = Wire.read();
+    return status;
+}
+</code></pre>
+<p>Since we're getting the status from the sensor, we're doing a read command with <code>Wire.requestFrom()</code>. We pass the address of the device we're talking to and the number of bytes we want back from the device. Then we have to wait for the response. You can call <code>Wire.available()</code> to check if there's any data that's been received (it actually returns the number of bytes received), then read it with <code>Wire.read()</code>.</p>
+<p>Next we'll use this to implement an initialization function:</p>
+<pre><code class="language-cpp">void init_aht20_sensor(uint8_t address) {
+    delay(SENSOR_INIT_DELAY);
+    
+    uint8_t status = get_status(address);
+    bool is_calibrated = status &amp; (1u &lt;&lt; 3);
+
+    if (!is_calibrated) {
+        const uint8_t cmd_buffer[3] = {CALIBRATE_CMD, 0x08, 0x00};
+        Serial.println(&quot;debug: calibrating sensor&quot;);
+
+        Wire.beginTransmission(address);
+        Wire.write(&amp;cmd_buffer[0], 3);
+        Wire.endTransmission();
+        
+        delay(SENSOR_CALIBRATION_DELAY);
+    }
+
+    Serial.println(&quot;debug: sensor ready&quot;);
+}
+</code></pre>
+<p>So we first call the function we just implemented <code>get_status()</code>, however that just returns a byte. In order to get the value of a specific bit, we'll need to do some bit-level logic and masking. These aren't commonly used in desktop programs so I'll go into a little more detail here. First the rightmost expression, <code>(1u &lt;&lt; 3)</code>. This takes a value of <code>0b0001</code> in binary and applies a shift left of 3 bit positions. If we shift the bits to the left 3 times, that <code>0b0001</code> becomes <code>0b1000</code>. Zeroes fill in the spots where a new value is required (below bit 0). </p>
+<p>Next we do a bit-wise logical AND between this value (the bitmask) and the status byte. That looks like <code>status &amp; 0b0000_1000</code>. Anything ANDed with 0 is 0 and anything ANDed with 1 is itself. So the result of that entire expression can be expressed as <code>0b0000_x000</code> where x is 1 or 0 depending on if the sensor is calibrated or not. If it's a 1, casting this to a <code>bool</code> will give it a value of <code>true</code>, otherwise it will be <code>false</code>.</p>
+<p>In the case where it's not calibrated, we need to send a calibration command. The datasheet describes it as a 3 bytes: the calibration command byte followed by <code>0x08 0x00</code>. Writing data to a sensor is a little more verbose. Start a write with <code>Wire.beginTransmission()</code>, write the data buffer of 3 bytes with <code>Wire.write()</code>, then end it with <code>Wire.endTransmission()</code>.</p>
+<p>That should be sufficient to initialize the sensor, let's add it to our program:</p>
+<pre><code class="language-cpp">// --snip--
+
+void init_aht20_sensor(uint8_t address);
+uint8_t get_status(uint8_t address);
+
+void setup() {
+    // --snip--
+    Serial.println(&quot;info: booting&quot;);
+
+    Wire.begin();
+    init_aht20_sensor(AHT20_I2C_ADDR);
+    Serial.println(&quot;info: initialized sensor&quot;);
+
+    while (true) {
+        // --snip--
+    }
+}
+
+void init_aht20_sensor(uint8_t address) {
+    // --snip--
+}
+
+uint8_t get_status(uint8_t address) {
+    // --snip--
+}
+</code></pre>
+<p>To wrap up the integration of the initialization routine, we just add a call to <code>Wire.begin()</code> to initialize the Arduino's I2C hardware similar to serial's <code>Serial.begin()</code>, then call our function.</p>
+<p>I recommend building and running the code really quick to verify you've got it working (and/or that the wiring between the Arduino and the sensor is correct). In your python program, you should see:</p>
+<pre><code>info: booting
+debug: calibrating sensor // this may be missing as it won't always be required
+debug: sensor ready
+info: initialized sensor
+LED state: OFF
+LED state: ON
+LED state: OFF 
+</code></pre>
+<p>With the initialization out of the way, let's read some data. The figure in the datasheet shows the contents and length of the data to be read back. This sensor measures both temperature and humidity so the measurement will contain both values. Out of the bytes returned the temperature data can be found in the 4th, 5th, and 6th byte and it has a size of 20 bits. The next size type up is a <code>uint32_t</code> so we'll plan to store it in that.</p>
+<pre><code class="language-cpp">const uint8_t TRIGGER_CMD(0xac);
+
+// --snip--
+
+float request_temperature_data(uint8_t address) {
+    // send a command
+    const uint8_t cmd_buffer[3] = {TRIGGER_CMD, 0x33, 0x00};
+    Wire.beginTransmission(address);
+    Wire.write(&amp;cmd_buffer[0], 3);
+    Wire.endTransmission();
+
+    bool data_available = false;
+    while (!data_available) {
+        delay(10);
+        uint8_t status = get_status(address);
+        if (!(status &amp; (1u &lt;&lt; 7))) {
+            data_available = true;
+        }
+    }
+
+    // --snip next section--
+}
+</code></pre>
+<p>First we need to send the command to trigger a measurement which is very similar to the calibrate command. The measurement takes some time to complete and we can determine when it's done by reading the status byte again. This time it's bit 7 instead of bit 3 so we adjust the masking appropriately, but there's one extra complication: 1 in this position indicates the sensor is busy and 0 means it's done, so we need to invert the logic. Be careful with the placement of your parentheses here, these can be very difficult problems to debug. I once had a bug that took several days to find because I had <code>~byte</code> instead of <code>!byte</code> (bitwise NOT instead of boolean NOT). We'll just loop until data is available.</p>
+<pre><code class="language-cpp">float request_temperature_data(uint8_t address) {
+    // --snip previous section--
+
+    const uint8_t READING_BYTES = 7;
+    uint8_t reading[READING_BYTES] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    Wire.requestFrom(address, READING_BYTES);
+    for (auto bytes_read = 0u; bytes_read &lt; READING_BYTES; ++bytes_read) {
+        if (Wire.available()) {
+            reading[bytes_read] = Wire.read();
+        } else {
+            delay(1);
+        }
+    }
+
+    // --snip next section--
+}
+</code></pre>
+<p>Then we can proceed to read the raw data from the sensor. The datasheet mentions that the payload size if 7 bytes and we've already determined which of those bytes we're interested in, but we'll just read them all. We loop through and fill a buffer.</p>
+<pre><code class="language-cpp">float request_temperature_data(uint8_t address) {
+    // --snip previous section--
+
+    uint32_t raw = ((uint32_t)(reading[3] &amp; 0b00001111) &lt;&lt; 16);
+    raw |= ((uint32_t)reading[4] &lt;&lt; 8);
+    raw |= reading[5];
+    float temperature = calculate_temperature_from_raw(raw);
+    return temperature;
+}
+</code></pre>
+<p>The last part is the most complicated. The first part to notice is the the 4th byte (<code>reading[3]</code>) actually contains temperature and humidity data. We only want the lowest 4 bits on account of this. But are these the lowest 4 bits of the temperature data or the highest 4 bits? The datasheet is remarkably unhelpful here, but it appears to follow convention: big-endian for protocol data. That means the most significant bytes are sent first. If you're ever unsure, try one way and see how the value changes at rest. If it's backwards, you'll see rapid swings in the data as the least significant bits will change frequently with noise on the sensor and they're in the wrong position.</p>
+<p>Since the 4 bits are the most significant, after masking them we'll shift them 16 places to leave room for the remaining 16 bits. Before we can shift though, we need to make sure the data being shifted fits into a data type that can fit all of the bits (remember that <code>reading</code> is an array of bytes). We can do so by casting the data to a 32-bit wide type with <code>(uint32_t)(data)</code>. Then we continue building up our raw measurement value with the two other bytes, which do not require masking. The syntax <code>raw |= data;</code> is shorthand for <code>raw = raw | data</code> and since we left space there, this will make that region of the data equal to the byte we're reading from.</p>
+<p>Our raw data isn't very useful as it's quite hard to read and understand, so we'll take one last step and calculate the temperature in units of degrees Celsius. We'll be referring to Section 6.2 of the datasheet for the formula.</p>
+<pre><code class="language-cpp">float calculate_temperature_from_raw(uint32_t raw_data) {
+    // See Section 6.2
+    auto ratio = static_cast&lt;float&gt;(raw_data) / (1ul &lt;&lt; 20);
+    ratio *= 200.;
+    ratio -= 50.;
+    return ratio;
+}
+</code></pre>
+<p>The first step of the calculation involves dividing by the full possible resolution, effectively giving us a value between 0.0 and 1.0. We'll need to cast the data to a floating point value which can represent decimals, otherwise the result will always be 0. Note that I'm using shifting for the denominator again. In binary, shifting a number to the left by 1 is equivalent to multiplying it by 2, just as shifting a number to the left in decimal one place is equivalent to multiplying by 10.</p>
+<p>Then we just multiply by 200 and subtract 50. This means the full range of temperature values that it's possible for the sensor to represent is -50 C to 150 C.</p>
+<p>Let's add the measurement code to our program's mainloop!</p>
+<pre><code class="language-cpp">void setup() {
+    // --snip--
+
+    while (true) {
+        digitalWrite(LED_PIN, led_state);
+        led_state = !led_state;
+
+        float temperature = request_temperature_data(AHT20_I2C_ADDR);
+        Serial.print(&quot;data: &quot;);
+        Serial.println(temperature);
+        delay(5000);
+    }
+}
+</code></pre>
+<p>I've removed the logging of the LED state as it's not very useful for our python program. We'll let the LED continue to blink though since it can be useful to know if the program is running at a glance.</p>
+<p>That's it! If you run your python program or check the Serial Monitor, you should see temperature values being reported in the terminal!</p>
+<pre><code>info: booting
+debug: sensor ready
+info: initialized sensor
+data: 25.72
+data: 25.71
+data: 25.71
+data: 28.37
+</code></pre>
+<p>In the next chapter we'll modify our python program to parse that data from a string in the format <code>&quot;data: 19.4&quot;</code> into a decimal number that can be plotted or have other analysis performed on it.</p>
+<p>Here's the completed Arduino program:</p>
+<pre><code class="language-cpp">#include &quot;Wire.h&quot;
+#include &lt;stdint.h&gt;
+
+const uint8_t AHT20_I2C_ADDR(0x38);
+const uint8_t GET_STATUS(0x71);
+const uint8_t CALIBRATE_CMD(0xbe);
+const uint8_t TRIGGER_CMD(0xac);
+const unsigned int SENSOR_INIT_DELAY(40);
+const unsigned int SENSOR_CALIBRATION_DELAY(10);
+
+void setup() {
+    // Initialization
+    const int LED_PIN = 13;
+    pinMode(LED_PIN, OUTPUT);
+    bool led_state = false;
+
+    Serial.begin(115200);
+    Serial.println();
+    Serial.println(&quot;info: booting&quot;);
+
+    Wire.begin();
+    init_aht20_sensor(AHT20_I2C_ADDR);
+    Serial.println(&quot;info: initialized sensor&quot;);
+
+    while (true) {
+        digitalWrite(LED_PIN, led_state);
+        led_state = !led_state;
+
+        float temperature = request_temperature_data(AHT20_I2C_ADDR);
+        Serial.print(&quot;data: &quot;);
+        Serial.println(temperature);
+        delay(5000);
+    }
+}
+
+uint8_t get_status(uint8_t address) {
+    Wire.requestFrom(address, 1);
+    while (!Wire.available()) {
+        delay(1);
+    }
+    uint8_t status = Wire.read();
+    return status;
+}
+
+void init_aht20_sensor(uint8_t address) {
+    delay(SENSOR_INIT_DELAY);
+    
+    uint8_t status = get_status(address);
+    bool is_calibrated = status &amp; (1u &lt;&lt; 3);
+
+    if (!is_calibrated) {
+        const uint8_t cmd_buffer[3] = {CALIBRATE_CMD, 0x08, 0x00};
+        Serial.println(&quot;debug: calibrating sensor&quot;);
+
+        Wire.beginTransmission(address);
+        Wire.write(&amp;cmd_buffer[0], 3);
+        Wire.endTransmission();
+        
+        delay(SENSOR_CALIBRATION_DELAY);
+    }
+
+    Serial.println(&quot;debug: sensor ready&quot;);
+}
+
+float request_temperature_data(uint8_t address) {
+    // send a command
+    const uint8_t cmd_buffer[3] = {TRIGGER_CMD, 0x33, 0x00};
+    Wire.beginTransmission(address);
+    Wire.write(&amp;cmd_buffer[0], 3);
+    Wire.endTransmission();
+
+    bool data_available = false;
+    while (!data_available) {
+        delay(10);
+        uint8_t status = get_status(address);
+        if (!(status &amp; (1u &lt;&lt; 7))) {
+            data_available = true;
+        }
+    }
+
+    const uint8_t READING_BYTES = 7;
+    uint8_t reading[READING_BYTES] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    Wire.requestFrom(address, READING_BYTES);
+    for (auto bytes_read = 0u; bytes_read &lt; READING_BYTES; ++bytes_read) {
+        if (Wire.available()) {
+            reading[bytes_read] = Wire.read();
+        } else {
+            delay(1);
+        }
+    }
+
+    uint32_t raw = ((uint32_t)(reading[3] &amp; 0b00001111) &lt;&lt; 16);
+    raw |= ((uint32_t)reading[4] &lt;&lt; 8);
+    raw |= reading[5];
+    float temperature = calculate_temperature_from_raw(raw);
+    return temperature;
+}
+
+float calculate_temperature_from_raw(uint32_t raw_data) {
+    // See Section 6.2
+    auto ratio = static_cast&lt;float&gt;(raw_data) / (1ul &lt;&lt; 20);
+    ratio *= 200.;
+    ratio -= 50.;
+    return ratio;
+}
+
+void loop() {}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../tutorial/chapter_3_pyserial.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../tutorial/chapter_5_uploading_data.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../tutorial/chapter_3_pyserial.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../tutorial/chapter_5_uploading_data.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

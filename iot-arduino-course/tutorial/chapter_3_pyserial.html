@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Reading the Serial Port in Python - Introduction to Internet of Things with Arduino and Python</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../installs.html">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_3_pyserial.html" class="active"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_4_temp_data.html"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_5_uploading_data.html"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="../appendix/influxdb.html">A2. Running InfluxDB</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Introduction to Internet of Things with Arduino and Python</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="reading-the-serial-port-in-python"><a class="header" href="#reading-the-serial-port-in-python">Reading the Serial Port in Python</a></h1>
+<p>In this chapter we'll be switching gears to write a host program in Python. Now that we've got serial data being emitted from the Arduino, we'll actually be able to read those bytes and manipulate them on the host side.</p>
+<p>Create a new directory for the project, like <code>data_reader</code>, and add a <code>main.py</code> file to it. Download or copy <a href="https://raw.githubusercontent.com/ssnover/iot-arduino-course/main/complete/mqtt-publisher/requirements.txt">this file</a> showing the required packages we'll need for this program. You can then install them into your hosted python environment with <code>python3 -m pip install -r requirements.txt</code>.</p>
+<p>Inside <code>main.py</code>, we'll start off with a barebones python script:</p>
+<pre><code class="language-py">import sys
+
+def main():
+    &quot;&quot;&quot;Entrypoint&quot;&quot;&quot;
+    tty_path = &quot;/dev/ttyACM0&quot; # Change this to the port from the Arduino IDE
+    if len(sys.argv) &gt; 1:
+        tty_path = sys.argv[1]
+    
+    print(f&quot;Connecting to serial port at {tty_path}&quot;)
+
+
+main()
+</code></pre>
+<p>At this point, all we're doing is defining a program which prints that it is connecting to a serial device (<code>tty_path</code>). I recommend populating a default for convenience; this should be based on whatever shows up as the Port in the Arduino IDE when the board is plugged in. We'll also parse the command line arguments so that that default can be overridden. The actual port can change depending on what USB port is used and what other devices are plugged in at any given time so this will prevent having to look it up all the time.</p>
+<p>As a quick aside, the syntax in the print statement is called an f-string (short for &quot;format string&quot;), which is a little bit newer in python and as a result isn't as common to see in tutorials. It can make print statements a little bit more readable in some cases. This is how it looks with a normal string:</p>
+<pre><code class="language-py">print(&quot;Connecting to serial port at {0}&quot;.format(tty_path))
+</code></pre>
+<p>You can quickly try it for yourself with <code>python3 main.py /dev/ttyACM1</code> and verify that the override is working.</p>
+<p>Now for the actual serial communication!</p>
+<pre><code class="language-py">import serial # New import for the pyserial library
+import sys
+
+def main():
+    # --snip--
+    print(f&quot;Connecting to serial port at {tty_path}&quot;)
+
+    serial_port = serial.Serial(tty_path, 115200, timeout=1)
+    serial_port.reset_input_buffer()
+
+    while True:
+        next_line = serial_port.readline()
+        if next_line:
+            print(next_line)
+
+# --snip--
+</code></pre>
+<p>Here we're using the pyserial library to get a connection to a serial port specified by its port name. We also specify the baud rate (<code>115200</code> baud) and a timeout. The timeout is specified in seconds and is important so that the program doesn't get stuck. This can happen because below we call <code>serial_port.readline()</code> which will not return until a line of data is ready, <em>unless</em> a timeout is specified in which case it will block for no longer than the timeout.</p>
+<p>Since the attempt to read a line from the serial port can timeout, we also have to handle the case where the function timed out and we didn't get any data. So we only print the data if we get some data.</p>
+<p>Make sure you've closed the Arduino IDE, then give this program a try! You should see a very similar output to the serial monitor, you've basically reimplemented it in python! You can close the program with <code>Ctrl+C</code>.</p>
+<pre><code>Connecting to serial port at /dev/ttyACM0
+b'\r\n'
+b'info: booting\r\n'
+b'LED state: OFF\r\n'
+b'LED state: ON\r\n'
+b'LED state: OFF\r\n'
+b'LED state: ON\r\n'
+b'LED state: OFF\r\n'
+b'LED state: ON\r\n'
+</code></pre>
+<p>Obviously, it's got a bit more decoration than the Serial Monitor display. This is how python prints encoded byte data, essentially assuming that it is ASCII. In order to turn it into a regular string, we'll need to decode it and probably remove the newline characters (<code>\r\n</code>). To do that, change <code>print(next_line)</code> to <code>print(next_line.decode().rstrip())</code>.</p>
+<p>Before moving on, let's just quickly add some nicer handling for when <code>Ctrl+C</code> is pressed.</p>
+<pre><code class="language-py">import serial
+import signal # New import
+import sys
+
+# Adding a global variable to track whether the program should be running
+running = True
+
+def exit_handler(sig, frame):
+    &quot;&quot;&quot;
+    This function will be called when we press Ctrl+C.
+    &quot;&quot;&quot;
+    global running
+    # Setting the variable to false signals that the program should exit
+    running = False
+
+
+def main():
+    # --snip--
+    if len(sys.argv) &gt; 1:
+        tty_path = sys.argv[1]
+    signal.signal(signal.SIGINT, exit_handler)
+
+    # --snip--
+    while running:
+        next_line = serial_port.readline()
+        if next_line:
+            print(next_line.decode().rstrip())
+
+    print(&quot;Exiting...&quot;)
+
+# --snip--
+</code></pre>
+<p>In the above source, we're adding a function which handles a request to exit the program, just using a boolean variable to decide if the program should keep running or not. In our <code>main</code> function we configure the python environment to call our function <code>exit_handler</code> when <code>Ctrl+C</code> is pressed. The term for this is <code>SIGINT</code> so we're mapping from that signal.</p>
+<p>In the next chapter, we'll go back to programming the Arduino IDE and actually tackle grabbing real sensor data! Just a quick recap of the full program, which is still quite small at this point:</p>
+<pre><code class="language-py">import serial
+import signal
+import sys
+
+running = True
+
+def exit_handler(sig, frame):
+    &quot;&quot;&quot;
+    This function will be called when we press Ctrl+C.
+    &quot;&quot;&quot;
+    global running
+    # Setting the variable to false signals that the program should exit
+    running = False
+
+
+def main():
+    &quot;&quot;&quot;Entrypoint&quot;&quot;&quot;
+    tty_path = &quot;/dev/ttyACM0&quot; # Change this to the port from the Arduino IDE
+    if len(sys.argv) &gt; 1:
+        tty_path = sys.argv[1]
+    print(f&quot;Connecting to serial port at {tty_path}&quot;)
+
+    serial_port = serial.Serial(tty_path, 115200, timeout=10)
+    serial_port.reset_input_buffer()
+
+    while running:
+        next_line = serial_port.readline()
+        if next_line:
+            print(next_line.decode().rstrip())
+
+    print(&quot;Exiting...&quot;)
+
+
+main()
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../tutorial/chapter_2_data_over_serial.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../tutorial/chapter_4_temp_data.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../tutorial/chapter_2_data_over_serial.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../tutorial/chapter_4_temp_data.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
