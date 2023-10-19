@@ -186,7 +186,7 @@ def main():
     # --snip--
     signal.signal(signal.SIGINT, exit_handler)
 
-    nqtt_broker_ip = &quot;192.168.5.100&quot;
+    mqtt_broker_ip = &quot;192.168.5.100&quot;
     client = mqtt.Client()
     client.connect(mqtt_broker_ip, 1883)
     client.loop_start()

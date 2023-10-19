@@ -168,7 +168,10 @@
                     <main>
                         <h1 id="reading-the-serial-port-in-python"><a class="header" href="#reading-the-serial-port-in-python">Reading the Serial Port in Python</a></h1>
 <p>In this chapter we'll be switching gears to write a host program in Python. Now that we've got serial data being emitted from the Arduino, we'll actually be able to read those bytes and manipulate them on the host side.</p>
-<p>Create a new directory for the project, like <code>data_reader</code>, and add a <code>main.py</code> file to it. Download or copy <a href="https://raw.githubusercontent.com/ssnover/iot-arduino-course/main/complete/mqtt-publisher/requirements.txt">this file</a> showing the required packages we'll need for this program. You can then install them into your hosted python environment with <code>python3 -m pip install -r requirements.txt</code>.</p>
+<p>Create a new directory for the project, like <code>data_reader</code>, and add a <code>main.py</code> file to it. Download or copy <a href="https://raw.githubusercontent.com/ssnover/iot-arduino-course/main/complete/mqtt-publisher/requirements.txt">this file</a> showing the required packages we'll need for this program. You can then install them into your hosted python environment with <code>python3 -m pip install -r requirements.txt</code> or with your IDE's Python package manager, here's the list of current required libraries:</p>
+<pre><code>pyserial==3.5
+paho-mqtt==1.6.1
+</code></pre>
 <p>Inside <code>main.py</code>, we'll start off with a barebones python script:</p>
 <pre><code class="language-py">import sys
 
