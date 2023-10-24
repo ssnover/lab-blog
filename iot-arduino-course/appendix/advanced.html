@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Uploading Data to the Database - Introduction to Internet of Things with Arduino and Python</title>
+        <title>A3. Advanced Topics - Introduction to Internet of Things with Arduino and Python</title>
 
 
         <!-- Custom HTML head -->
@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../installs.html">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_3_pyserial.html"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_4_temp_data.html"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_5_uploading_data.html" class="active"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="../appendix/influxdb.html">A2. Running InfluxDB</a></li><li class="chapter-item expanded affix "><a href="../appendix/advanced.html">A3. Advanced Topics</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="../installs.html">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="../tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_3_pyserial.html"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_4_temp_data.html"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="../tutorial/chapter_5_uploading_data.html"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="../appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="../appendix/influxdb.html">A2. Running InfluxDB</a></li><li class="chapter-item expanded affix "><a href="../appendix/advanced.html" class="active">A3. Advanced Topics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,68 +166,38 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="uploading-data-to-the-database"><a class="header" href="#uploading-data-to-the-database">Uploading Data to the Database</a></h1>
-<p>In this section we'll take our newly measured temperature data and parse it from the messages we're receiving from the Arduino. That data can then be uploaded into a database, in this case an InfluxDB instance. If you're following along remotely, see the appendix section on running InfluxDB with Docker.</p>
-<p>We'll be using MQTT as a means of uploading data into InfluxDB. However the database also supports other means including a REST API, but it requires an API token to use. InfluxDB supports plugins for accepting data records via Telegraf, an associated project, and one of those allows subscribing to certain messages on an MQTT broker.</p>
-<h2 id="a-little-about-mqtt"><a class="header" href="#a-little-about-mqtt">A Little About MQTT</a></h2>
-<p>MQTT is a means of sending messages between programs whereby the programs agree on a topic name like <code>&quot;temperature_data&quot;</code> and then the programs can publish data on this topic by sending the data to a broker or it can subscribe to data on this topic, again by talking to the broker.</p>
-<p>In our case, the Python program will connect to the MQTT broker and send data to it by publishing to a topic. The InfluxDB/Telegraf instance will connect to the MQTT broker as a subscriber so that the broker will send it data. That data gets put into InfluxDB.</p>
-<h2 id="using-mqtt-with-python"><a class="header" href="#using-mqtt-with-python">Using MQTT with Python</a></h2>
-<p>We'll be using a third party library from Eclipse called <code>paho-mqtt</code> in order to publish data in our python program. It doesn't require much code to get started:</p>
-<pre><code class="language-py">import json
-import paho.mqtt.client as mqtt
-import serial
-import signal
-import sys
-
-# --snip--
-
-def main():
-    # --snip--
-    signal.signal(signal.SIGINT, exit_handler)
-
-    mqtt_broker_ip = &quot;192.168.5.100&quot;
-    client = mqtt.Client()
-    client.connect(mqtt_broker_ip, 1883)
-    client.loop_start()
-
-    serial_port = serial.Serial(tty_path, 115200, timeout=1)
-    serial_port.reset_input_buffer()
-
-    while running:
-        next_line = serial_port.readline()
-        if next_line:
-            next_line = next_line.decode().rstrip()
-            print(next_line)
-            if next_line.startswith(&quot;data: &quot;):
-                try:
-                    temperature = float(next_line[6:].rstrip())
-                    name = &quot;ssnover&quot;
-                    client.publish(f&quot;/temperature/{name}&quot;, json.dumps({&quot;temperature&quot;: temperature}))
-                except ValueError:
-                    print(f&quot;error: Could not extract data from {next_line}&quot;)
-
-    client.loop_stop()
-    print(&quot;Exiting...&quot;)
-
-# --snip--
-</code></pre>
-<p>In the above code, we create a new instance of the <code>Client</code> class and connect it to an MQTT broker. I've set <code>mqtt_broker_ip</code> to the IP of the device on my network that's hosting the broker and port 1883, which is the default port for MQTT. </p>
-<p>The MQTT library allows the user to handle an event loop in order to gracefully handle incoming messages if you're subscribed to any topics. Since we're not doing here, I've called <code>Client.loop_start()</code> and <code>Client.loop_end()</code> before and after the main loop. This just controls the starting and stopping of an additional thread which does the actual communication with the broker. If you were to leave this out, you'd actually see no data getting sent!</p>
-<p>Finally, let's look at actually publishing the data. We know that the format of data messages coming from the Arduino is <code>&quot;data: [DECIMAL NUMBER]&quot;</code> so we first check that the line starts with that expected prefix. If it passes that basic check, we take everything after the prefix, remove any dangling whitespace characters with <code>rstrip()</code>, and then try to convert that to a float as a sanity check. This can throw an exception of <code>ValueError</code> if it's not a valid decimal number so I've just handled that by logging it and moving on. To finally publish, we need the topic name and the data. I use <code>&quot;ssnover/temperature&quot;</code> for the topic for the purpose of the in-person session so I suggest using your name in that pattern as well so the database can be ready to read it. The topic data is just a string format so we convert our temperature data back into a string.</p>
-<p>If everything is working correctly, you ought to see the temperature data coming in on the dashboard in the InfluxDB instance, go give it a look!</p>
+                        <p>If you've stuck with me this far, you must be interested in the subject matter! </p>
+<p>This page will serve as a living list of links for additional writing I do for content that's related to this course which discusses different aspects of developing embedded systems. If there's a topic you're interested in and you don't see it here, feel free to send me a message!</p>
+<p>I will also link to posts or writing that I've seen others produce on the topic of embedded systems so as not to unnecessarily reinvent the wheel on every topic.</p>
+<h2 id="advanced-topics"><a class="header" href="#advanced-topics">Advanced Topics</a></h2>
+<h3 id="roll-your-own"><a class="header" href="#roll-your-own">Roll Your Own</a></h3>
+<ul>
+<li><a href="https://shanesnover.com/2023/10/21/reading-i2c-sensor.html">Reading an I2C Sensor with Arduino</a></li>
+<li>To Be Written: Creating Your Own Binary Protocol</li>
+<li>To Be Written: Publishing an Arduino Library</li>
+</ul>
+<h3 id="rust"><a class="header" href="#rust">Rust</a></h3>
+<ul>
+<li>To Be Written: Bare Metal IoT with Rust
+<ul>
+<li><a href="https://github.com/ssnover/atmosensor/tree/77ca9d8f50d82b906bc9abff5b472a62e4fd171e/atmosensor-fw">Source for a CO2 Sensor in Rust for ARM Cortex-M</a></li>
+</ul>
+</li>
+<li>To Be Written: Using Rust for IoT Edge Devices
+<ul>
+<li><a href="https://shanesnover.com/2023/04/09/plant-monitor.html">Quick Write up on a Soil Moisture Sensor</a></li>
+</ul>
+</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../tutorial/chapter_4_temp_data.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../appendix/influxdb.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="../influxdb.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -235,13 +205,10 @@ def main():
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../tutorial/chapter_4_temp_data.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../appendix/influxdb.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="../influxdb.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>

@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="installs.html">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_3_pyserial.html"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_4_temp_data.html"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_5_uploading_data.html"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="appendix/influxdb.html">A2. Running InfluxDB</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="installs.html">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_3_pyserial.html"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_4_temp_data.html"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_5_uploading_data.html"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="appendix/influxdb.html">A2. Running InfluxDB</a></li><li class="chapter-item expanded affix "><a href="appendix/advanced.html">A3. Advanced Topics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -189,6 +189,24 @@
 <p>Verify your installation by opening the IDE, creating a new sketch, and navigating the menu to <code>Tools</code> -&gt; <code>Board</code> -&gt; <code>Arduino AVR Boards</code> -&gt; <code>Arduino UNO</code>. This is the board we'll be focusing on in this course. Then select the checkmark button in the top left and verify that the output window eventually finishes printing and shows something like below:</p>
 <pre><code>Sketch uses 444 bytes (1%) of program storage space. Maximum is 32256 bytes.
 Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
+</code></pre>
+<h3 id="ubuntu-2204-based-linux-distros"><a class="header" href="#ubuntu-2204-based-linux-distros">Ubuntu 22.04-based Linux Distros</a></h3>
+<p>A quick note that if you're using an unofficial Arduino, you'll find that the device does not actually mount as it's supposed to. If you run <code>lsusb</code> you might see an entry for CH340 or CP210x USB drivers, but no device at <code>/dev/ttyACM0</code> or <code>/dev/ttyUSB0</code>. By default Ubuntu 22.04 and distributions based on it ship with a Braille reader software called <code>brltty</code> which is aggressive in claiming devices it thinks are Braille readers.</p>
+<p>In <code>dmesg</code>, you might see something like this as a symptom:</p>
+<pre><code>input: BRLTTY 6.4 Linux Screen Driver Keyboard as /devices/virtual/input/input31
+usb 1-8: usbfs: interface 0 claimed by ch341 while 'brltty' sets config #1
+ch341-uart ttyUSB0: ch341-uart converter now disconnected from ttyUSB0
+</code></pre>
+<p>If you are not blind and no one who is blind is using your computer, feel free to uninstall it: <code>sudo apt remove brltty</code>. If you want to keep the software on your system for one reason or another, try:</p>
+<pre><code class="language-sh">sudo systemctl stop brltty-udev.service
+sudo systemctl mask brltty-udev.service
+sudo systemctl stop brltty.service
+sudo systemctl disable brltty.service
+</code></pre>
+<p>Or if you use a Braille screen reader, you might just try editing the udev rules at <code>/usr/lib/udev/rules.d/85-brltty.rules</code>. For the CH340 (with USB VID and PID of <code>1a86:7523</code>), remove the corresponding entry:</p>
+<pre><code># Device: 1A86:7523
+# Baum [NLS eReader Zoomax (20 cells)]
+ENV{PRODUCT}==&quot;1a86/7523/*&quot;, ENV{BRLTTY_BRAILLE_DRIVER}=&quot;bm&quot;, GOTO=&quot;brltty_usb_run&quot;
 </code></pre>
 <h2 id="python-and-pip"><a class="header" href="#python-and-pip">Python and pip</a></h2>
 <p>Similarly, for installing <code>python3</code> and <code>pip</code>, there are great directions available. Here is a link to Python's <a href="https://wiki.python.org/moin/BeginnersGuide/Download">documentation for installation</a> on various operating systems.</p>
@@ -562,6 +580,7 @@ def main():
 <p>Finally, let's look at actually publishing the data. We know that the format of data messages coming from the Arduino is <code>&quot;data: [DECIMAL NUMBER]&quot;</code> so we first check that the line starts with that expected prefix. If it passes that basic check, we take everything after the prefix, remove any dangling whitespace characters with <code>rstrip()</code>, and then try to convert that to a float as a sanity check. This can throw an exception of <code>ValueError</code> if it's not a valid decimal number so I've just handled that by logging it and moving on. To finally publish, we need the topic name and the data. I use <code>&quot;ssnover/temperature&quot;</code> for the topic for the purpose of the in-person session so I suggest using your name in that pattern as well so the database can be ready to read it. The topic data is just a string format so we convert our temperature data back into a string.</p>
 <p>If everything is working correctly, you ought to see the temperature data coming in on the dashboard in the InfluxDB instance, go give it a look!</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="demonstration-with-influxdb"><a class="header" href="#demonstration-with-influxdb">Demonstration with InfluxDB</a></h1>
+<p><img src="image.png" alt="Dashboard with temperature data" /></p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="a1-hardware-required"><a class="header" href="#a1-hardware-required">A1. Hardware Required</a></h1>
 <p>If you're taking the class session in person, you can pretty much skip this page. This page is just documentation of the Arduino setup for those who are remote and interested in purchasing the hardware necessary to run the code for this course.</p>
 <h2 id="list-of-hardware"><a class="header" href="#list-of-hardware">List of Hardware</a></h2>
@@ -588,6 +607,29 @@ def main():
 <p>I'll be curt on explanation here and instead point to a repository with a working set of configuration files. The repository hosting them all is here: https://github.com/ssnover/mqtt-influx-config </p>
 <p>You can run it while in the root directory with <code>docker compose up -d</code> which will launch three services: an MQTT broker, an Influx timeseries database, and an ingress service for the data that connects the two.</p>
 <p>The first time that you run it, you'll be prompted to create an admin user, organization, and bucket on the webpage at <code>http://localhost:8086</code>. You'll also need to generate the API token with the UI. Once you've created these, edit the respective fields in the <code>telegraf.conf</code> file. If you host this for an extended period, make sure not to commit any files containing the API token. Relaunch the services with <code>docker compose down</code> and <code>docker compose up -d</code> and the new configuration should take hold.</p>
+<div style="break-before: page; page-break-before: always;"></div><p>If you've stuck with me this far, you must be interested in the subject matter! </p>
+<p>This page will serve as a living list of links for additional writing I do for content that's related to this course which discusses different aspects of developing embedded systems. If there's a topic you're interested in and you don't see it here, feel free to send me a message!</p>
+<p>I will also link to posts or writing that I've seen others produce on the topic of embedded systems so as not to unnecessarily reinvent the wheel on every topic.</p>
+<h2 id="advanced-topics"><a class="header" href="#advanced-topics">Advanced Topics</a></h2>
+<h3 id="roll-your-own"><a class="header" href="#roll-your-own">Roll Your Own</a></h3>
+<ul>
+<li><a href="https://shanesnover.com/2023/10/21/reading-i2c-sensor.html">Reading an I2C Sensor with Arduino</a></li>
+<li>To Be Written: Creating Your Own Binary Protocol</li>
+<li>To Be Written: Publishing an Arduino Library</li>
+</ul>
+<h3 id="rust"><a class="header" href="#rust">Rust</a></h3>
+<ul>
+<li>To Be Written: Bare Metal IoT with Rust
+<ul>
+<li><a href="https://github.com/ssnover/atmosensor/tree/77ca9d8f50d82b906bc9abff5b472a62e4fd171e/atmosensor-fw">Source for a CO2 Sensor in Rust for ARM Cortex-M</a></li>
+</ul>
+</li>
+<li>To Be Written: Using Rust for IoT Edge Devices
+<ul>
+<li><a href="https://shanesnover.com/2023/04/09/plant-monitor.html">Quick Write up on a Soil Moisture Sensor</a></li>
+</ul>
+</li>
+</ul>
 
                     </main>
 

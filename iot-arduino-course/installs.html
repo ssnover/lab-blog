@@ -83,7 +83,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="installs.html" class="active">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_3_pyserial.html"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_4_temp_data.html"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_5_uploading_data.html"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="appendix/influxdb.html">A2. Running InfluxDB</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="installs.html" class="active">Install Prerequisites</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="tutorial/chapter_1_blinking_an_led.html"><strong aria-hidden="true">1.</strong> Blinking an LED</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_2_data_over_serial.html"><strong aria-hidden="true">2.</strong> Reporting Data Over Serial</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_3_pyserial.html"><strong aria-hidden="true">3.</strong> Reading the Serial Port in Python</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_4_temp_data.html"><strong aria-hidden="true">4.</strong> Collecting Temperature Data</a></li><li class="chapter-item expanded "><a href="tutorial/chapter_5_uploading_data.html"><strong aria-hidden="true">5.</strong> Uploading Data to the Database</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="influxdb.html">Demonstration with InfluxDB</a></li><li class="spacer"></li><li class="chapter-item expanded affix "><a href="appendix/hardware.html">A1. Hardware Required</a></li><li class="chapter-item expanded affix "><a href="appendix/influxdb.html">A2. Running InfluxDB</a></li><li class="chapter-item expanded affix "><a href="appendix/advanced.html">A3. Advanced Topics</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -173,6 +173,24 @@
 <p>Verify your installation by opening the IDE, creating a new sketch, and navigating the menu to <code>Tools</code> -&gt; <code>Board</code> -&gt; <code>Arduino AVR Boards</code> -&gt; <code>Arduino UNO</code>. This is the board we'll be focusing on in this course. Then select the checkmark button in the top left and verify that the output window eventually finishes printing and shows something like below:</p>
 <pre><code>Sketch uses 444 bytes (1%) of program storage space. Maximum is 32256 bytes.
 Global variables use 9 bytes (0%) of dynamic memory, leaving 2039 bytes for local variables. Maximum is 2048 bytes.
+</code></pre>
+<h3 id="ubuntu-2204-based-linux-distros"><a class="header" href="#ubuntu-2204-based-linux-distros">Ubuntu 22.04-based Linux Distros</a></h3>
+<p>A quick note that if you're using an unofficial Arduino, you'll find that the device does not actually mount as it's supposed to. If you run <code>lsusb</code> you might see an entry for CH340 or CP210x USB drivers, but no device at <code>/dev/ttyACM0</code> or <code>/dev/ttyUSB0</code>. By default Ubuntu 22.04 and distributions based on it ship with a Braille reader software called <code>brltty</code> which is aggressive in claiming devices it thinks are Braille readers.</p>
+<p>In <code>dmesg</code>, you might see something like this as a symptom:</p>
+<pre><code>input: BRLTTY 6.4 Linux Screen Driver Keyboard as /devices/virtual/input/input31
+usb 1-8: usbfs: interface 0 claimed by ch341 while 'brltty' sets config #1
+ch341-uart ttyUSB0: ch341-uart converter now disconnected from ttyUSB0
+</code></pre>
+<p>If you are not blind and no one who is blind is using your computer, feel free to uninstall it: <code>sudo apt remove brltty</code>. If you want to keep the software on your system for one reason or another, try:</p>
+<pre><code class="language-sh">sudo systemctl stop brltty-udev.service
+sudo systemctl mask brltty-udev.service
+sudo systemctl stop brltty.service
+sudo systemctl disable brltty.service
+</code></pre>
+<p>Or if you use a Braille screen reader, you might just try editing the udev rules at <code>/usr/lib/udev/rules.d/85-brltty.rules</code>. For the CH340 (with USB VID and PID of <code>1a86:7523</code>), remove the corresponding entry:</p>
+<pre><code># Device: 1A86:7523
+# Baum [NLS eReader Zoomax (20 cells)]
+ENV{PRODUCT}==&quot;1a86/7523/*&quot;, ENV{BRLTTY_BRAILLE_DRIVER}=&quot;bm&quot;, GOTO=&quot;brltty_usb_run&quot;
 </code></pre>
 <h2 id="python-and-pip"><a class="header" href="#python-and-pip">Python and pip</a></h2>
 <p>Similarly, for installing <code>python3</code> and <code>pip</code>, there are great directions available. Here is a link to Python's <a href="https://wiki.python.org/moin/BeginnersGuide/Download">documentation for installation</a> on various operating systems.</p>
