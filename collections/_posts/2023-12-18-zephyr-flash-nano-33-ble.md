@@ -16,8 +16,8 @@ I did some testing with the Arduino IDE and found that it didn't have this probl
 
 Next, I tried with the bossac version packaged with Arduino and managed to get a success: `~/.arduino15/packages/arduino/tools/bossac/1.9.1-arduino2/bossac -d -p /dev/ttyACM0 -U -i -e -w build/zephyr/zephyr.bin `
 
-Then, I added the `-R` flag to tell bossac to reset the board after flashing which causes the application image to boot after flashing: ``
-``~/.arduino15/packages/arduino/tools/bossac/1.9.1-arduino2/bossac -d -p /dev/ttyACM0 -U -i -e -w -R build/zephyr/zephyr.bin`
+Then, I added the `-R` flag to tell bossac to reset the board after flashing which causes the application image to boot after flashing:
+`~/.arduino15/packages/arduino/tools/bossac/1.9.1-arduino2/bossac -d -p /dev/ttyACM0 -U -i -e -w -R build/zephyr/zephyr.bin`
 
 Finally, I noticed that the Arduino IDE was able to program the board repeatedly without physical intervention and the firmware image runs (meaning it is no longer in bootloader mode). I noticed a `-a` flag which the help text describes as "erase and reset via Arduino 1200 baud hack", but I'm still not clear on how this flag needs to be used as I couldn't figure out a chain of commands to get it to work consistently. This invocation yields an error message `Failed to open port at 1200bps`: `~/.arduino15/packages/arduino/tools/bossac/1.9.1-arduino2/bossac -d -p /dev/ttyACM0 -a`
 
