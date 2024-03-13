@@ -4,7 +4,7 @@ title: "Megabit as an Embedded WebAssembly Display Prototype"
 date: 2024-03-13
 projects: [megabit]
 redirect_from:
-  - /megabit
+  - /megabit/
 ---
 
 ![Nyan Cat App on Simulator](/assets/img/nyan-cat-sim.webp)
