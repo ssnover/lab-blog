@@ -13,6 +13,8 @@ A WebAssembly retro-display.
 
 I've been taking a sabbatical for the past three months, and it's been giving me a good bit of time to explore a technology that's piqued my interest: WebAssembly! This article talks over my motivations and current results for executing WebAssembly in an IoT edge device.
 
+All of the code referenced in this post can be found in [this repository](https://github.com/ssnover/megabit).
+
 # Background
 
 I initially caught the WASM bug when I had a need to turn a CLI tool into a more friendly tool at AMP Robotics and I was able to put together a quick prototype as a single page web app. Then at SmartThings, the Hub device used [Lua drivers](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers) to support different product families and protocols, and due to some limitations of Lua there was a lot of interest in WebAssembly from engineers there for a host environment that could run on this embedded Linux platform.
@@ -42,6 +44,7 @@ The runtime allows applications to import a number of APIs related to updating a
 Any language which can target WebAssembly can be used to implement apps for Megabit (in contrast to my inspiration which runs Starlark apps). The bindings can be kind of tricky to set up for guest languages which are more high-level like JavaScript, but that's where leveraging `extism` comes in handy to generate easier to use wrappers to handle passing of more complicated structures over the guest-host boundary.
 
 I'm primarily focused on making Rust applications easier to write since that's what I primarily develop in and to this end I also added a trait `MegabitApp` and a proc-macro to make the whole thing easier, here's an example with a scrolling test app:
+
 ```rust
 use extism_pdk::*;
 use megabit_app_sdk::{megabit_wasm_app, MegabitApp};
@@ -89,3 +92,5 @@ My experience digging into WebAssembly so far has been great. I used Rust to exe
 When I first started in on this project I was envisioning apps following a permissions model like an Android app, where fine-grained permissions to host resources are exposed to properly sandbox apps. The ecosystem is not currently there, but not because it's held back technologically, it's only missing the effort to build out the necessary APIs around existing runtimes like `wasmtime` in order to selectively stub some specific parts of WASI with a `SandboxPermissionDenied` returning function or something of the sort. I think fine control like this likely develop soon as it's useful not just for edge devices where you want to keep things from snooping on your local network, but also in cloud environments where you want to limit which domains or IP addresses an app might be accessing. I see some upcoming talks at WasmIO 2024 discussing this very feature.
 
 An additional pain point that I'm stumbling on is utilizing async in apps. `wasmtime` supports asynchronous execution, but it seems to require making all of the APIs exported to the host `async`, and the complication of supporting the Rust async model across multiple languages means that convenient wrappers like `extism` become more difficult to implement, maintain, and use in a consistent way. One way I'm currently envisioning circumventing this is simply adding an additional entrypoint API which allows the host to "warn" the guest environment of an incoming cancel if it doesn't complete. I think this willl allow the host to cancel misbehaving apps while being tolerant of an internally running async executor.
+
+As a reminder, if you're curious about the code, it can be found [here](https://github.com/ssnover/megabit).
