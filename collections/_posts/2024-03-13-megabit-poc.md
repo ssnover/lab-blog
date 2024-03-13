@@ -40,6 +40,7 @@ The runtime allows applications to import a number of APIs related to updating a
 ## WebAssembly Apps
 
 ![Game of Life Video](/assets/img/game-of-life.webp)
+*(note: if you're on Safari, this animation renders very slowly)*
 
 Any language which can target WebAssembly can be used to implement apps for Megabit (in contrast to my inspiration which runs Starlark apps). The bindings can be kind of tricky to set up for guest languages which are more high-level like JavaScript, but that's where leveraging `extism` comes in handy to generate easier to use wrappers to handle passing of more complicated structures over the guest-host boundary.
 
