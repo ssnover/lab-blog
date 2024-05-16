@@ -107,7 +107,7 @@ Let's take a quick look at where our executable memory comes from. We're using `
 
 I swapped out the bytecode from `burnttoys` example with a simple `add` function. But where did I get the bytecode from? In [Compiler Explorer](https://godbolt.org), you can see the mapping of Rust (or other languages) source code into compiled assembly in the right-hand editor pane. If you click the little gear icon and check the box "Compile to binary object", it will show the hexadecimal bytecode representation for each instruction.
 
-![[Pasted image 20240515154103.png]]
+![Assembly Instructions with Bytecode in Hex](/assets/img/20240515-bytecode-godbolt.png)
 
 This yields the four bytes for the function I implemented above. However, notice that I still needed to cast to a type and I knew the arguments and return type for that function pointer out-of-band:
 
